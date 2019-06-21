@@ -95,7 +95,7 @@ export interface RouteProps {
 export class Route<T extends RouteProps = RouteProps> extends React.Component<T, any> { }
 
 export interface RouterProps {
-  history: H.History;
+    history?: H.History;
 }
 export class Router extends React.Component<RouterProps, any> { }
 

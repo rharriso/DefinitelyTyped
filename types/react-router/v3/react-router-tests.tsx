@@ -156,6 +156,13 @@ ReactDOM.render((
 	</Router>
 ), document.body);
 
+ReactDOM.render(
+    <Router>
+        <Route path="/" component={Master} />
+    </Router>,
+    document.body
+);
+
 const history = createMemoryHistory({ current: "baseurl" });
 const routes = (
 	<Route path="/" component={Master}>
