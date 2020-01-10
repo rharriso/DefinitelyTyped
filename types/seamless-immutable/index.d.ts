@@ -5,6 +5,7 @@
 //                 Geir Sagberg <https://github.com/geirsagberg>
 //                 Richard Honor <https://github.com/RMHonor>
 //                 Paul Huynh <https://github.com/pheromonez>
+//                 Ross Harrison <https://github.com/rharriso>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 // TypeScript Version: 2.8
 
@@ -38,7 +39,6 @@ declare namespace SeamlessImmutable {
 
     interface ImmutableObjectMixin<T> {
         set<K extends keyof T>(property: K, value: T[K]): Immutable<T>;
-        set<TValue>(property: string, value: TValue): Immutable<T>;
 
         setIn<K extends keyof T>(propertyPath: [ K ], value: T[K]): Immutable<T>;
         setIn<K extends keyof T, L extends keyof T[K]>(propertyPath: [ K, L ], value: T[K][L]): Immutable<T>;
@@ -47,7 +47,6 @@ declare namespace SeamlessImmutable {
             propertyPath: [ K, L, M, N ], value: T[K][L][M][N]): Immutable<T>;
         setIn<K extends keyof T, L extends keyof T[K], M extends keyof T[K][L], N extends keyof T[K][L][M], O extends keyof T[K][L][M][N]>(
             propertyPath: [ K, L, M, N, O ], value: T[K][L][M][N][O]): Immutable<T>;
-        setIn<TValue>(propertyPath: string[], value: TValue): Immutable<T>;
 
         getIn<K extends keyof T>(propertyPath: [ K ]): Immutable<T[K]>;
         getIn<K extends keyof T>(propertyPath: [ K ], defaultValue: T[K]): Immutable<T[K]>;
@@ -61,7 +60,7 @@ declare namespace SeamlessImmutable {
         getIn<K extends keyof T, L extends keyof T[K], M extends keyof T[K][L], N extends keyof T[K][L][M], O extends keyof T[K][L][M][N]>(
             propertyPath: [ K, L, M, N, O ], defaultValue: T[K][L][M][N][O]): Immutable<T[K][L][M][N][O]>;
         getIn(propertyPath: string[]): Immutable<any>;
-        getIn<TValue>(propertyPath: string[], defaultValue: TValue): Immutable<TValue>;
+        getIn(propertyPath: string[], defaultValue: any): Immutable<any>;
 
         asMutable(opts?: AsMutableOptions<false>): { [K in keyof T]: Immutable<T[K]> };
         asMutable(opts: AsMutableOptions<true>): T;
@@ -70,7 +69,6 @@ declare namespace SeamlessImmutable {
         merge(part: DeepPartial<T>, config?: MergeConfig): Immutable<T>;
 
         update<K extends keyof T>(property: K, updaterFunction: (value: T[K], ...additionalParameters: any[]) => any, ...additionalArguments: any[]): Immutable<T>;
-        update<TValue>(property: string, updaterFunction: (value: TValue, ...additionalParameters: any[]) => any, ...additionalArguments: any[]): Immutable<T>;
 
         updateIn<K extends keyof T>(
             propertyPath: [ K ], updaterFunction: (value: T[K], ...additionalParameters: any[]) => any, ...additionalArguments: any[]): Immutable<T>;
@@ -82,7 +80,6 @@ declare namespace SeamlessImmutable {
             propertyPath: [ K, L, M, N ], updaterFunction: (value: T[K][L][M][N], ...additionalParameters: any[]) => any, ...additionalArguments: any[]): Immutable<T>;
         updateIn<K extends keyof T, L extends keyof T[K], M extends keyof T[K][L], N extends keyof T[K][L][M], O extends keyof T[K][L][M][N]>(
             propertyPath: [ K, L, M, N, O ], updaterFunction: (value: T[K][L][M][N][O], ...additionalParameters: any[]) => any, ...additionalArguments: any[]): Immutable<T>;
-        updateIn<TValue = any>(propertyPath: string[], updaterFunction: (value: TValue, ...additionalParameters: any[]) => any, ...additionalArguments: any[]): Immutable<T>;
 
         without<K extends keyof T>(property: K): Immutable<T>;
         without<K extends keyof T>(...properties: K[]): Immutable<T>;

@@ -224,20 +224,26 @@ interface NonDeepMutableExtendedUser {
             line1: 'Big house'
         }
     });
-    const data: {
-        propertyId: string
-    } = {
+    const data = {
         propertyId: 'user.1'
     };
 
     // set: property name is strongly checked
     const updatedUser01: Immutable.Immutable<User> = immutableUser.set('firstName', 'Whirlwind');
+    // can't set property that doesn't exist on the type
+    // $ExpectError
     const updatedUser02: Immutable.Immutable<User> = immutableUser.set(data.propertyId, 'Whirlwind');
+    // can force with any
+    const updatedUser03: Immutable.Immutable<User> = immutableUser.set(data.propertyId as any, 'Whirlwind');
 
     // setIn: property path is strongly checked for up to 5 arguments (helps with refactoring and intellisense)
     // but will fall back to any[] if there are dynamic arguments on the way
     const updatedUser11: Immutable.Immutable<ExtendedUser> = immutableUserEx.setIn(['address', 'line1'], 'Small house');
-    const updatedUser12: Immutable.Immutable<ExtendedUser> = immutableUserEx.setIn([ data.propertyId, 'line1' ], 'Small house');
+    // can't set property that doesn't exist on the type
+    // $ExpectError
+    const updatedUser12: Immutable.Immutable<ExtendedUser> = immutableUserEx.setIn([ 'address', data.propertyId ], 'Small house');
+    // can force with any
+    const updatedUser13: Immutable.Immutable<ExtendedUser> = immutableUserEx.setIn([ 'address', data.propertyId as any ], 'Small house');
 
     // asMutable
     // Can't mutate beyond 1 level deep
@@ -267,14 +273,10 @@ interface NonDeepMutableExtendedUser {
 
     // update: property name is strongly checked
     const updatedUser41: Immutable.Immutable<User> = immutableUser.update('firstName', x => x.toLowerCase() + ' Whirlwind');
-    // the type of the updated value must be explicity specified in case of fallback
-    const updatedUser42: Immutable.Immutable<User> = immutableUser.update<string>(data.propertyId, x => x.toLowerCase() + ' Whirlwind');
 
     // updateIn: property path is strongly checked for up to 5 arguments (helps with refactoring and intellisense)
     // but will fall back to any[] if there are dynamic arguments on the way
     const updatedUser51: Immutable.Immutable<User> = immutableUserEx.updateIn([ 'address', 'line1' ], x => x.toLowerCase() + ' 43');
-    // the type of the updated value must be explicity specified in case of fallback
-    const updatedUser52: Immutable.Immutable<User> = immutableUserEx.updateIn<string>([ data.propertyId, 'line1' ], x => x.toLowerCase() + ' 43');
 
     // without
     const simpleUser1: Immutable.Immutable<User> = immutableUserEx.without('address');
@@ -282,6 +284,7 @@ interface NonDeepMutableExtendedUser {
     // getIn: propertyPath is strongly typed up to 5 parameters
     const firstNameWithoutDefault: string = immutableUser.getIn(['firstName']); // infers Immutable<string>
     const firstNameWithDefault = immutableUser.getIn(['firstName'], ''); // infers Immutable<string>
+    const firstNameDynamicNotAllowed = immutableUser.getIn(['first' + 'name']);
     const firstNameWithDynamicPathWithoutDefault = immutableUser.getIn(['first' + 'name']);
     const firstNameWithDynamicPathWithDefault = immutableUser.getIn(['first' + 'name'], '');
     const line1WithoutDefault = immutableUserEx.getIn(['address', 'line1']);
@@ -309,3 +312,32 @@ interface NonDeepMutableExtendedUser {
     immutableDate2.getDate();
     immutableDate2.asMutable().setDate(1);
 }
+
+//
+// Working With Discriminated Types
+//
+interface Animal<T extends string> {
+    speciesName: string;
+    order: T;
+}
+
+interface Bird extends Animal<'ave'> {
+    featherColor: string;
+}
+
+interface Cat extends Animal<'mamal'> {
+    furColor: string;
+}
+
+type AnimalUnion = Bird | Cat;
+
+const setSpeciesName = (animal: Immutable.ImmutableObject<AnimalUnion>, speciesName: string) => {
+    animal.set('speciesName', speciesName);
+    // Can't set types that aren't shared by the union
+    // $ExpectError
+    animal.set('furColor', speciesName);
+
+    if (animal.order === 'mamal') {
+        animal.set('furColor', speciesName);
+    }
+};
